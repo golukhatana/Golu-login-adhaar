@@ -13,6 +13,56 @@
     button { padding: 10px 20px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 5px; }
   </style>
 </head>
+  <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+<!-- Firebase Config -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD8B_q5gsCVAVBfyIUxrSGYwjtmSiA21KI",
+    authDomain: "golu-ludo-f57ff.firebaseapp.com",
+    projectId: "golu-ludo-f57ff",
+    storageBucket: "golu-ludo-f57ff.appspot.com",
+    messagingSenderId: "545741544870",
+    appId: "1:545741544870:web:d05aa96e4bff2a43dec367",
+    measurementId: "G-MLN8BE4P9C"
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<!-- OTP Logic -->
+<script>
+  let confirmationResult;
+
+  window.onload = function () {
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('send-otp-btn', {
+      size: 'invisible'
+    });
+
+    document.getElementById('send-otp-btn').addEventListener('click', function () {
+      const phoneNumber = '+91' + document.getElementById('phone').value;
+      const appVerifier = window.recaptchaVerifier;
+
+      firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then(function (result) {
+          confirmationResult = result;
+          alert("OTP Sent!");
+        }).catch(function (error) {
+          alert("Error: " + error.message);
+        });
+    });
+
+    document.getElementById('verify-otp-btn').addEventListener('click', function () {
+      const code = document.getElementById('otp').value;
+      confirmationResult.confirm(code).then(function (result) {
+        alert("Phone verified ✅");
+      }).catch(function (error) {
+        alert("OTP Error: " + error.message);
+      });
+    });
+  };
+</script>
 <body>
 
 <h2>📲 Golu Ludo Login</h2>
