@@ -24,7 +24,7 @@
     authDomain: "golu-ludo-f57ff.firebaseapp.com",
     projectId: "golu-ludo-f57ff",
     storageBucket: "golu-ludo-f57ff.appspot.com",
-    messagingSenderId: "545741544870",
+a    messagingSenderId: "545741544870",
     appId: "1:545741544870:web:d05aa96e4bff2a43dec367",
     measurementId: "G-MLN8BE4P9C"
   };
@@ -148,3 +148,15 @@ const analytics = getAnalytics(app);
 
 </body>
 </html>
+document.getElementById('send-otp-btn').addEventListener('click', function () {
+  const phoneNumber = '+91' + document.getElementById('phone').value;
+  const appVerifier = window.recaptchaVerifier;
+
+  firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+    .then(function (result) {
+      confirmationResult = result;
+      alert("OTP Sent!");
+    }).catch(function (error) {
+      alert("Error: " + error.message);
+    });
+});
