@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Golu Ludo Login</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <style>
+    body { font-family: Arial; background: #f0f0f0; text-align: center; padding: 30px; }
+    .box { background: white; padding: 20px; border-radius: 10px; display: inline-block; margin-top: 20px; }
+    input { width: 90%; padding: 10px; margin: 10px 0; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<h2>📲 Golu Ludo Login</h2>
+<div class="box" id="login-box">
+  <input type="text" id="phone" placeholder="Enter Phone Number (+91xxxxxxxxxx)" /><br>
+  <div id="recaptcha-container"></div>
+  <button onclick="sendOTP()">Send OTP</button><br>
+  <input type="text" id="otp" placeholder="Enter OTP" /><br>
+  <button onclick="verifyOTP()">Verify OTP</button>
+</div>
+
+<div class="box" id="aadhaar-box" style="display:none;">
+  <h3>🔒 Aadhaar Verification</h3>
+  <input type="text" id="aadhaar" placeholder="Enter Aadhaar Number" /><br>
+  <input type="text" id="aadhaarName" placeholder="Enter Name (Aadhaar)" /><br>
+  <button onclick="verifyAadhaar()">Verify Aadhaar</button>
+</div>
+
+<div class="box" id="result-box" style="display:none;">
+  <h3 id="result-msg"></h3>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+
+  let confirmationResult = null;
+
+  function sendOTP() {
+    const phone = document.getElementById('phone').value;
+    firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
+      .then((result) => {
+        confirmationResult = result;
+        alert("OTP sent!");
+      }).catch((error) => {
+        alert(error.message);
+      });
+  }
+
+  function verifyOTP() {
+    const otp = document.getElementById('otp').value;
+    confirmationResult.confirm(otp).then((result) => {
+      document.getElementById('login-box').style.display = 'none';
+      document.getElementById('aadhaar-box').style.display = 'block';
+    }).catch((error) => {
+      alert("Invalid OTP");
+    });
+  }
+
+  function verifyAadhaar() {
+    const aadhaar = document.getElementById('aadhaar').value;
+    const name = document.getElementById('aadhaarName').value.trim().toLowerCase();
+    if (/^\d{12}$/.test(aadhaar) && name.length > 2) {
+      document.getElementById('aadhaar-box').style.display = 'none';
+      document.getElementById('result-box').style.display = 'block';
+      document.getElementById('result-msg').textContent = "✅ Aadhaar Verified Successfully!";
+    } else {
+      alert("Invalid Aadhaar or name");
+    }
+  }
+</script>
+
+</body>
+</html>
