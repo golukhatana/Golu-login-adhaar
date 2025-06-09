@@ -1,47 +1,50 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Golu Ludo Login</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <meta charset="UTF-8">
+  <title>📲 Golu Ludo Login</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <style>
-    body { font-family: Arial; background: #f0f0f0; text-align: center; padding: 30px; }
-    .box { background: white; padding: 20px; border-radius: 10px; display: inline-block; margin-top: 20px; }
-    input { width: 90%; padding: 10px; margin: 10px 0; font-size: 16px; }
-    button { padding: 10px 20px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 5px; }
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 100px; background: #f4f4f4; }
+    .box { background: white; padding: 20px; display: inline-block; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
+    input { padding: 8px; margin: 8px 0; width: 200px; }
+    button { padding: 10px 20px; margin: 10px; }
   </style>
 </head>
-  <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<body>
+  <h2>📲 Golu Ludo Login</h2>
+  <div class="box">
+    <input type="text" id="phone" placeholder="Enter Phone Number (+91xxxxxx)" /><br />
+    <div id="recaptcha-container"></div>
+    <button id="send-otp-btn">Send OTP</button><br />
+    <input type="text" id="otp" placeholder="Enter OTP" /><br />
+    <button id="verify-otp-btn">Verify OTP</button>
+  </div>
 
-<!-- Firebase Config -->
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyD8B_q5gsCVAVBfyIUxrSGYwjtmSiA21KI",
-    authDomain: "golu-ludo-f57ff.firebaseapp.com",
-    projectId: "golu-ludo-f57ff",
-    storageBucket: "golu-ludo-f57ff.appspot.com",
-a    messagingSenderId: "545741544870",
-    appId: "1:545741544870:web:d05aa96e4bff2a43dec367",
-    measurementId: "G-MLN8BE4P9C"
-  };
-  firebase.initializeApp(firebaseConfig);
-</script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8B_q5gsCVAVBfyIUxrSGYwjtmSiA21KI",
+      authDomain: "golu-ludo-f57ff.firebaseapp.com",
+      projectId: "golu-ludo-f57ff",
+      storageBucket: "golu-ludo-f57ff.appspot.com",
+      messagingSenderId: "545741544870",
+      appId: "1:545741544870:web:d05aa96e4bff2a43dec367"
+    };
 
-<!-- OTP Logic -->
-<script>
-  let confirmationResult;
+    firebase.initializeApp(firebaseConfig);
 
-  window.onload = function () {
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('send-otp-btn', {
-      size: 'invisible'
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      size: 'normal',
+      callback: function(response) {
+        // reCAPTCHA solved
+      }
     });
 
+    let confirmationResult;
+
     document.getElementById('send-otp-btn').addEventListener('click', function () {
-      const phoneNumber = '+91' + document.getElementById('phone').value;
+      const phoneNumber = document.getElementById('phone').value;
       const appVerifier = window.recaptchaVerifier;
 
       firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
@@ -49,114 +52,18 @@ a    messagingSenderId: "545741544870",
           confirmationResult = result;
           alert("OTP Sent!");
         }).catch(function (error) {
-          alert("Error: " + error.message);
+          alert("Error sending OTP: " + error.message);
         });
     });
 
     document.getElementById('verify-otp-btn').addEventListener('click', function () {
       const code = document.getElementById('otp').value;
       confirmationResult.confirm(code).then(function (result) {
-        alert("Phone verified ✅");
+        alert("✅ Phone number verified!");
       }).catch(function (error) {
-        alert("OTP Error: " + error.message);
+        alert("❌ OTP verification failed: " + error.message);
       });
     });
-  };
-</script>
-<body>
-
-<h2>📲 Golu Ludo Login</h2>
-<div class="box" id="login-box">
-  <input type="text" id="phone" placeholder="Enter Phone Number (+91xxxxxxxxxx)" /><br>
-  <div id="recaptcha-container"></div>
-  <button onclick="sendOTP()">Send OTP</button><br>
-  <input type="text" id="otp" placeholder="Enter OTP" /><br>
-  <button onclick="verifyOTP()">Verify OTP</button>
-</div>
-
-<div class="box" id="aadhaar-box" style="display:none;">
-  <h3>🔒 Aadhaar Verification</h3>
-  <input type="text" id="aadhaar" placeholder="Enter Aadhaar Number" /><br>
-  <input type="text" id="aadhaarName" placeholder="Enter Name (Aadhaar)" /><br>
-  <button onclick="verifyAadhaar()">Verify Aadhaar</button>
-</div>
-
-<div class="box" id="result-box" style="display:none;">
-  <h3 id="result-msg"></h3>
-</div>
-
-<script>
-  // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyD8B_q5gsCVAVBfyIUxrSGYwjtmSiA21KI",
-  authDomain: "golu-ludo-f57ff.firebaseapp.com",
-  projectId: "golu-ludo-f57ff",
-  storageBucket: "golu-ludo-f57ff.firebasestorage.app",
-  messagingSenderId: "545741544870",
-  appId: "1:545741544870:web:d05aa96e4bff2a43dec367",
-  measurementId: "G-MLN8BE4P9C"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-  firebase.initializeApp(firebaseConfig);
-  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
-
-  let confirmationResult = null;
-
-  function sendOTP() {
-    const phone = document.getElementById('phone').value;
-    firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
-      .then((result) => {
-        confirmationResult = result;
-        alert("OTP sent!");
-      }).catch((error) => {
-        alert(error.message);
-      });
-  }
-
-  function verifyOTP() {
-    const otp = document.getElementById('otp').value;
-    confirmationResult.confirm(otp).then((result) => {
-      document.getElementById('login-box').style.display = 'none';
-      document.getElementById('aadhaar-box').style.display = 'block';
-    }).catch((error) => {
-      alert("Invalid OTP");
-    });
-  }
-
-  function verifyAadhaar() {
-    const aadhaar = document.getElementById('aadhaar').value;
-    const name = document.getElementById('aadhaarName').value.trim().toLowerCase();
-    if (/^\d{12}$/.test(aadhaar) && name.length > 2) {
-      document.getElementById('aadhaar-box').style.display = 'none';
-      document.getElementById('result-box').style.display = 'block';
-      document.getElementById('result-msg').textContent = "✅ Aadhaar Verified Successfully!";
-    } else {
-      alert("Invalid Aadhaar or name");
-    }
-  }
-</script>
-
+  </script>
 </body>
 </html>
-document.getElementById('send-otp-btn').addEventListener('click', function () {
-  const phoneNumber = '+91' + document.getElementById('phone').value;
-  const appVerifier = window.recaptchaVerifier;
-
-  firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-    .then(function (result) {
-      confirmationResult = result;
-      alert("OTP Sent!");
-    }).catch(function (error) {
-      alert("Error: " + error.message);
-    });
-});
